@@ -1,0 +1,28 @@
+<div class="table-wrapper">
+    <table mat-table [dataSource]="dataSource" matSort
+        class="mat-elevation-z8 sub-table">
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> Id </th>
+            <td mat-cell *matCellDef="let job"> <a
+                    href="https://eu-west-1.console.aws.amazon.com/batch/home?region=eu-west-1#jobs/fargate/detail/7a30c795-94fa-4487-9e02-8fc24c1e346a">{{job.id}}</a>
+            </td>
+        </ng-container>
+        @for (column of displayedColumns; track column) {
+        <ng-container matColumnDef="{{column}}">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{columnsLabel[column]}}
+            </th>
+            <td mat-cell *matCellDef="let execution"> {{execution[column]}}
+            </td>
+        </ng-container>
+        }
+        <tr mat-header-row *matHeaderRowDef="allColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: allColumns;"
+            [class.errored]="row.result === 'ERROR'"
+            [class.running]="!row.result"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[10, 20, 50]"
+        showFirstLastButtons
+        aria-label="Select page">
+    </mat-paginator>
+</div>

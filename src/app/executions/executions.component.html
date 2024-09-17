@@ -1,0 +1,29 @@
+<div class="wrapper">
+    <div>Include</div>
+    <div class="filters">
+        <mat-checkbox [(ngModel)]="includeRunningExecutions"
+            (change)="setStatusFilter()"
+            [disabled]="isDisabled(includeRunningExecutions)">Running
+            executions</mat-checkbox>
+        <mat-checkbox [(ngModel)]="includeFinishedExecutions"
+            (change)="setStatusFilter()"
+            [disabled]="isDisabled(includeFinishedExecutions)">Finished
+            executions</mat-checkbox>
+        <mat-form-field>
+            <mat-label>Enter a date range</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+                <input [value]="startDate$ | async"
+                    (dateChange)="setDates($event, startDate$)" matStartDate
+                    placeholder="Start date">
+                <input [value]="endDate$ | async"
+                    (dateChange)="setDates($event, endDate$)"
+                    matEndDate placeholder="End date">
+            </mat-date-range-input>
+            <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix
+                [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+    </div>
+    <app-executions-list [executions]="executions"></app-executions-list>
+</div>

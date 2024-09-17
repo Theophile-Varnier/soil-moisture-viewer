@@ -1,0 +1,80 @@
+<div>
+    <mat-form-field>
+        <mat-label>Columns</mat-label>
+        <mat-select [(ngModel)]="displayedLabels"
+            (selectionChange)="updateSelection()" multiple>
+            @for (column of availableColumns; track column) {
+            <mat-option [value]="column">{{column}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <div
+        style="display: flex; align-items: center;"
+        [ngStyle]="{'visibility':(jobsService.loading$ | async) ? 'visible': 'hidden'}">
+        <span>Loading...</span>
+        <mat-progress-spinner
+            color="primary"
+            mode="indeterminate" [diameter]="14">
+        </mat-progress-spinner>
+    </div>
+    <table mat-table matSort multiTemplateDataRows [dataSource]="dataSource"
+        class="mat-elevation-z8">
+        @for (column of displayedLabels; track column) {
+        <ng-container matColumnDef="{{column}}">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{columnsLabel[column]}}
+            </th>
+            <td mat-cell *matCellDef="let job"> {{job[column]}} </td>
+        </ng-container>
+        }
+        <ng-container matColumnDef="expand">
+            <th mat-header-cell *matHeaderCellDef
+                aria-label="row actions">&nbsp;</th>
+            <td mat-cell *matCellDef="let job">
+                <button mat-icon-button aria-label="expand row"
+                    (click)="(expandedJob = expandedJob === job ? null : job); $event.stopPropagation()">
+                    @if (expandedJob === job) {
+                    <mat-icon>keyboard_arrow_up</mat-icon>
+                    } @else {
+                    <mat-icon>keyboard_arrow_down</mat-icon>
+                    }
+                </button>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell
+                *matHeaderCellDef><mat-checkbox
+                    (change)="toggleSelectAll($event.checked)"
+                    [checked]="allChecked()"
+                    [indeterminate]="someChecked()"></mat-checkbox></th>
+            <td mat-cell *matCellDef="let job">
+                <mat-checkbox [checked]="selectedJobs().includes(job)"
+                    (change)="toggleSelect(job)"></mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="executions">
+            <td mat-cell *matCellDef="let job"
+                [attr.colspan]="displayedColumns.length">
+                <div class="example-element-detail"
+                    [@detailExpand]="job == expandedJob ? 'expanded' : 'collapsed'">
+                    <div class="table-wrapper">
+                        <app-executions-list
+                            [executions]="job.executions"></app-executions-list>
+                    </div>
+                </div>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row
+            class="example-element-row"
+            *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['executions']"
+            class="example-detail-row"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[10, 20, 50]"
+        showFirstLastButtons
+        aria-label="Select page">
+    </mat-paginator>
+</div>

@@ -1,0 +1,21 @@
+a, a:visited, a:hover, a:active {
+    color: inherit;
+}
+
+table.mat-mdc-table {
+    .mat-mdc-row {
+        height: auto;
+    }
+
+    .errored {
+        background-color: rgba(209, 87, 87, .8);
+    }
+
+    .running {
+        background-color: rgba(209, 209, 87, 0.5);
+    }
+}
+
+:host {
+    width: 100%;
+}

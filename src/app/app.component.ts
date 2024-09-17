@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import {
+  NavigationEnd,
+  Router,
   RouterLink,
   RouterLinkActive,
   RouterModule,
@@ -27,7 +29,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  links = ['Jobs', 'Executions'];
-  activeLink = this.links[0];
+  links = ['jobs', 'executions'];
+  activeLink: string;
   title = 'soil-moisture-viewer';
+  constructor(private router: Router) {
+    this.router.events.subscribe((val) => {
+      if (val instanceof NavigationEnd) {
+        this.activeLink = val.url.split('/')[1];
+      }
+    });
+  }
 }

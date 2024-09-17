@@ -1,0 +1,19 @@
+.jobs-filter {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.wrapper{
+    padding: 20px;
+}
+
+.id-container {
+    width: 32em;
+}
+
+.actions-menu {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}

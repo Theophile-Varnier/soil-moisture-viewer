@@ -1,0 +1,25 @@
+<div class="auth-form"
+    *ngIf="authService.user$ | async as user; else auth_form">
+    <h2 style="margin-bottom:20px;color: #000;">{{user.givenNames}}</h2>
+    <button mat-flat-button color="primary"
+        (click)="logout()">Logout</button>
+</div>
+<ng-template #auth_form>
+    <form class="auth-form">
+        <mat-form-field>
+            <mat-label>API url</mat-label>
+            <input matInput color="primary"
+                [(ngModel)]="apiUrl"
+                name="apiUrl" />
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>API key</mat-label>
+            <input type="password" matInput
+                [(ngModel)]="apiKey"
+                name="apiKey" />
+            <mat-error>errorMessage()</mat-error>
+        </mat-form-field>
+        <button type="submit" mat-flat-button color="primary"
+            (click)="onSubmit()">Login</button>
+    </form>
+</ng-template>
