@@ -1,10 +1,10 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 api.module.ts
 api/api.ts
 api/jobs.service.ts
 api/runs.service.ts
+api/users.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
@@ -38,6 +38,7 @@ model/polygon.ts
 model/priority.ts
 model/productSubType.ts
 model/productType.ts
+model/user.ts
 model/validationError.ts
 param.ts
 variables.ts

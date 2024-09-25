@@ -1,34 +1,25 @@
 <div class="wrapper">
-    <div class="jobs-filter">
-        <mat-form-field>
-            <mat-label>Status</mat-label>
-            <mat-select [value]="statuses[0]"
-                (selectionChange)="setStatus($event)">
-                @for (status of statuses; track status) {
-                <mat-option [value]="status">{{status}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-        <div>
-            Or
-        </div>
-        <mat-form-field class="id-container">
-            <mat-label>Ids</mat-label>
-            <textarea [(ngModel)]="ids" (input)="parseInput()"
-                matInput></textarea>
-        </mat-form-field>
-        <div class="actions-menu">
-            <button mat-flat-button [matMenuTriggerFor]="menu"
-                [disabled]="!selectedJobs.length">Actions</button>
-            <mat-menu #menu="matMenu">
-                <button mat-menu-item
-                    (click)="rerunJobs()">Rerun</button>
-                <button mat-menu-item
-                    (click)="updateJobsStatus(jobStatus.Active)">Activate</button>
-                <button mat-menu-item
-                    (click)="updateJobsStatus(jobStatus.Inactive)">Deactivate</button>
-            </mat-menu>
-        </div>
-        <app-job-list [(selectedJobs)]="selectedJobs"></app-job-list>
+    <mat-card appearance="outlined" class="filters-card">
+        <mat-card-header>
+            <mat-card-title>Filters</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="jobs-filter">
+                <app-jobs-filters></app-jobs-filters>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <div class="actions-menu">
+        <button mat-flat-button [matMenuTriggerFor]="menu"
+            [disabled]="!selectedJobs.length">Actions</button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item
+                (click)="rerunJobs()">Rerun</button>
+            <button mat-menu-item
+                (click)="updateJobsStatus(jobStatus.Active)">Activate</button>
+            <button mat-menu-item
+                (click)="updateJobsStatus(jobStatus.Inactive)">Deactivate</button>
+        </mat-menu>
     </div>
+    <app-job-list></app-job-list>
 </div>

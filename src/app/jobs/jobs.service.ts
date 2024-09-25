@@ -26,7 +26,9 @@ import { AuthService } from '../auth/auth.service';
 })
 export class JobsService {
   private pristine: boolean = true;
-  private _jobs$: Observable<JobTableDto[]>;
+  private _jobs$: Observable<JobTableDto[]> = new BehaviorSubject<
+    JobTableDto[]
+  >([]);
 
   public get jobs$(): Observable<JobTableDto[]> {
     return this._jobs$;
@@ -51,100 +53,13 @@ export class JobsService {
   constructor(
     private jobsApiService: JobsApiService,
     private authService: AuthService
-  ) {
-    this._jobsByIds$ = combineLatest([
-      this.authService.user$.pipe(filter((v) => !!v)),
-      this._ids$.pipe(
-        mergeMap((ids) => from(ids)),
-        mergeMap((id) =>
-          this.jobsApiService.getJobDetailJobsJobIdGet(id).pipe(
-            catchError((err) => {
-              return EMPTY;
-            }),
-            map((j) => new JobTableDto(j))
-          )
-        ),
-        scan((acc, curr) => {
-          if (this.pristine) {
-            this.pristine = false;
-            return [curr];
-          }
-          return [...acc, curr];
-        }, [] as JobTableDto[])
-      ),
-    ]).pipe(map(([auth, id]) => id));
+  ) {}
 
-    this._currentPageJobs$ = combineLatest([
-      this.authService.user$.pipe(filter((v) => !!v)),
-      this._currentStatus$,
-      this._currentPage$,
-    ]).pipe(
-      tap(() => this._loading$.next(true)),
-      mergeMap(([auth, status, page]) =>
-        this.jobsApiService
-          .getJobListJobsGet(
-            undefined,
-            status.toUpperCase() as JobStatus,
-            undefined,
-            page,
-            100
-          )
-          .pipe(
-            map((jobs) => jobs.map((j) => new JobTableDto(j))),
-            tap((jobs) => {
-              if (jobs.length && page < 3) {
-                this._currentPage$.next(page + 1);
-              } else {
-                this._loading$.next(false);
-              }
-            })
-          )
-      )
-    );
-    this._jobs$ = merge(
-      this._currentPageJobs$.pipe(
-        scan((acc, curr) => {
-          if (this.pristine) {
-            this.pristine = false;
-            return [...curr];
-          }
-          return [...acc, ...curr];
-        }, [] as JobTableDto[])
-      ),
-      this._jobsByIds$
-    ).pipe(share());
-  }
+  setCurrentStatus(status: string) {}
 
-  setCurrentStatus(status: string) {
-    this.pristine = true;
-    this._currentStatus$.next(status);
-    this._currentPage$.next(1);
-  }
+  setJobsId(ids: string[]) {}
 
-  setJobsId(ids: string[]) {
-    this.pristine = true;
-    this._ids$.next(ids);
-  }
+  rerunJobs(jobs: JobTableDto[]) {}
 
-  rerunJobs(jobs: JobTableDto[]) {
-    this._loading$.next(true);
-    this.jobsApiService
-      .rerunJobsJobsRerunPost(jobs.map((j) => j.id))
-      .subscribe((d) => this._loading$.next(false));
-  }
-
-  setJobsStatus(jobs: JobTableDto[], status: JobStatus) {
-    this._loading$.next(true);
-    forkJoin(
-      jobs.map((j) =>
-        this.jobsApiService.updateJobJobsJobIdPatch(j.id, {
-          status,
-          endDate: j.endDate,
-        })
-      )
-    ).subscribe((d) => {
-      this._loading$.next(false);
-      jobs.forEach((j) => (j.status = status));
-    });
-  }
+  setJobsStatus(jobs: JobTableDto[], status: JobStatus) {}
 }

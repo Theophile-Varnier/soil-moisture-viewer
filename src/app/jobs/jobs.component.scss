@@ -1,7 +1,13 @@
-.jobs-filter {
+.jobs-filter app-jobs-filters {
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: start;
+}
+
+.filters-card {
+    max-width: 50%;
+    border-color: var(--mdc-outlined-card-outline-color, var(--mat-app-outline-variant))
 }
 
 .wrapper{

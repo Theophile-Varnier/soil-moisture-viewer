@@ -1,5 +1,5 @@
 <div class="auth-form"
-    *ngIf="authService.user$ | async as user; else auth_form">
+    *ngIf="user$ | async as user; else auth_form">
     <h2 style="margin-bottom:20px;color: #000;">{{user.givenNames}}</h2>
     <button mat-flat-button color="primary"
         (click)="logout()">Logout</button>
@@ -17,7 +17,6 @@
             <input type="password" matInput
                 [(ngModel)]="apiKey"
                 name="apiKey" />
-            <mat-error>errorMessage()</mat-error>
         </mat-form-field>
         <button type="submit" mat-flat-button color="primary"
             (click)="onSubmit()">Login</button>

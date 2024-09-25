@@ -26,6 +26,7 @@ export interface JobExecutionCreated {
     jobs: Array<string>;
     rootPath: string;
     rerun?: boolean;
+    errors: Array<string>;
 }
 export namespace JobExecutionCreated {
 }

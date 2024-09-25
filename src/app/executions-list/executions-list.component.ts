@@ -1,31 +1,31 @@
-import { Component, effect, input, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  ViewChild,
+} from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { JobExecutionCreated } from '../api-client';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideLuxonDateAdapter } from '@angular/material-luxon-adapter';
 import { CommonModule } from '@angular/common';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ExecutionTableDto } from './execution-table';
 
 @Component({
   selector: 'app-executions-list',
   standalone: true,
   imports: [
     CommonModule,
-    MatFormFieldModule,
-    MatCheckboxModule,
-    FormsModule,
     MatTableModule,
-    MatDatepickerModule,
     MatPaginatorModule,
     MatSortModule,
+    MatTooltipModule,
   ],
-  providers: [provideLuxonDateAdapter()],
   templateUrl: './executions-list.component.html',
   styleUrl: './executions-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExecutionsListComponent {
   displayedColumns: string[] = [
@@ -36,7 +36,6 @@ export class ExecutionsListComponent {
     'endDate',
     'result',
     'rerun',
-    'jobs',
   ];
 
   columnsLabel: Record<string, string> = {
@@ -48,11 +47,13 @@ export class ExecutionsListComponent {
     endDate: 'Period end date',
     result: 'Result',
     rerun: 'Rerun',
+    jobs: 'Jobs',
+    errors: 'Errors',
   };
 
   allColumns: string[];
 
-  dataSource = new MatTableDataSource<JobExecutionCreated>();
+  dataSource = new MatTableDataSource<ExecutionTableDto>();
 
   executions = input.required<JobExecutionCreated[]>();
 
@@ -62,7 +63,9 @@ export class ExecutionsListComponent {
   constructor() {
     this.allColumns = Object.keys(this.columnsLabel);
     effect(() => {
-      this.dataSource.data = this.executions();
+      this.dataSource.data = this.executions().map(
+        (e) => new ExecutionTableDto(e)
+      );
       this.dataSource.sort = this.sort!;
       this.dataSource.paginator = this.paginator!;
     });

@@ -1,16 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  model,
   OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { JobsService } from '../jobs/jobs.service';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { JobTableDto } from './job-table';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -28,6 +26,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ExecutionsListComponent } from '../executions-list/executions-list.component';
+import { Store } from '@ngrx/store';
+import { AppState } from '../store/state';
+import { jobsTableSelector } from '../store/jobs/selectors';
+import { JobsActions } from '../store/jobs/actions';
 
 @Component({
   selector: 'app-job-list',
@@ -94,21 +96,26 @@ export class JobListComponent implements OnDestroy, OnInit {
 
   expandedJob?: JobTableDto;
 
-  selectedJobs = model<JobTableDto[]>([]);
+  private numberOfSelectedJobs = 0;
 
-  constructor(protected jobsService: JobsService) {
+  selectedJobsIds$ = this.store
+    .select((state) => state.jobs.selectedJobsIds)
+    .pipe(tap((ids) => (this.numberOfSelectedJobs = ids.length)));
+
+  constructor(private store: Store<AppState>) {
     this.displayedLabels = [...this.availableColumns];
     this.displayedColumns = [...this.displayedLabels, ...this.mandatoryColumns];
   }
 
   ngOnInit() {
-    this.jobsSubscription = this.jobsService.jobs$.subscribe((jobs) => {
-      this.selectedJobs.set([]);
-      this.dataSource.data = jobs;
+    this.jobsSubscription = this.store
+      .select(jobsTableSelector)
+      .subscribe((jobs) => {
+        this.dataSource.data = jobs;
 
-      this.dataSource.sort = this.sort!;
-      this.dataSource.paginator = this.paginator!;
-    });
+        this.dataSource.sort = this.sort!;
+        this.dataSource.paginator = this.paginator!;
+      });
   }
 
   @ViewChild(MatSort) sort?: MatSort;
@@ -121,33 +128,32 @@ export class JobListComponent implements OnDestroy, OnInit {
   }
 
   protected toggleSelectAll(selected: boolean) {
-    if (selected) {
-      this.selectedJobs.set(this.dataSource.data);
-    } else {
-      this.selectedJobs.set([]);
-    }
+    this.store.dispatch(
+      JobsActions.batchSelectJobs({
+        ids: selected ? this.dataSource.data.map((job) => job.id) : [],
+      })
+    );
   }
 
-  protected toggleSelect(job: JobTableDto) {
-    this.selectedJobs.update((jobs) => {
-      if (jobs.includes(job)) {
-        return jobs.filter((j) => j !== job);
-      }
-      return [...jobs, job];
-    });
+  protected toggleSelect(job: JobTableDto, checked: boolean) {
+    this.store.dispatch(
+      checked
+        ? JobsActions.selectJob({ id: job.id })
+        : JobsActions.deselectJob({ id: job.id })
+    );
   }
 
   protected allChecked(): boolean {
     return (
       !!this.dataSource.data.length &&
-      this.dataSource.data.every((job) => this.selectedJobs()?.includes(job))
+      this.numberOfSelectedJobs === this.dataSource.data.length
     );
   }
 
   protected someChecked(): boolean {
     return (
-      this.dataSource.data.some((job) => this.selectedJobs()?.includes(job)) &&
-      this.dataSource.data.some((job) => !this.selectedJobs()?.includes(job))
+      this.numberOfSelectedJobs > 0 &&
+      this.numberOfSelectedJobs < this.dataSource.data.length
     );
   }
 

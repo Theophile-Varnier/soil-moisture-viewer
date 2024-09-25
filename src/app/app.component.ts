@@ -29,7 +29,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  links = ['jobs', 'executions'];
+  links = ['jobs', 'executions', 'map'];
   activeLink: string;
   title = 'soil-moisture-viewer';
   constructor(private router: Router) {

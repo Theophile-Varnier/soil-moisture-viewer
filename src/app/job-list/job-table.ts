@@ -37,7 +37,7 @@ export class JobTableDto {
         )
       ).toISOString();
     }
-    this.executions = src.executions.sort(
+    this.executions = [...src.executions].sort(
       (a, b) =>
         new Date(b.executionStartDate).getTime() -
         new Date(a.executionStartDate).getTime()

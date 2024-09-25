@@ -1,28 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { JobExecutionCreated, RunsService } from '../api-client';
-import {
-  BehaviorSubject,
-  combineLatest,
-  filter,
-  mergeMap,
-  Subject,
-} from 'rxjs';
-import {
-  DateRange,
-  MatDatepickerInputEvent,
-  MatDatepickerModule,
-} from '@angular/material/datepicker';
-import { provideLuxonDateAdapter } from '@angular/material-luxon-adapter';
-import { DateTime } from 'luxon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../auth/auth.service';
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { ExecutionsListComponent } from '../executions-list/executions-list.component';
+import { MatCardModule } from '@angular/material/card';
+import { Store } from '@ngrx/store';
+import { AppState } from '../store/state';
+import { ExecutionsFiltersActions } from '../store/executions/actions';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-executions',
@@ -33,16 +20,15 @@ import { ExecutionsListComponent } from '../executions-list/executions-list.comp
     MatFormFieldModule,
     MatCheckboxModule,
     FormsModule,
-    MatTableModule,
     MatDatepickerModule,
-    MatPaginatorModule,
-    MatSortModule,
+    MatCardModule,
   ],
-  providers: [provideLuxonDateAdapter()],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './executions.component.html',
   styleUrl: './executions.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExecutionsComponent implements OnInit {
+export class ExecutionsComponent {
   displayedColumns: string[] = [
     'id',
     'productType',
@@ -55,64 +41,40 @@ export class ExecutionsComponent implements OnInit {
     'jobs',
   ];
 
-  protected includeRunningExecutions: boolean = true;
-  protected includeFinishedExecutions: boolean = false;
-  protected statusFilter$: Subject<boolean | undefined> = new BehaviorSubject<
-    boolean | undefined
-  >(false);
-  protected startDate$: Subject<DateTime> = new BehaviorSubject<DateTime>(
-    DateTime.now().startOf('day')
-  );
-  protected endDate$: Subject<DateTime> = new BehaviorSubject<DateTime>(
-    DateTime.now().startOf('day')
-  );
-  executions: JobExecutionCreated[] = [];
-  constructor(
-    private runsService: RunsService,
-    private authService: AuthService
-  ) {}
+  executions$ = this.store.select((state) => state.executions.executions);
+  filters$ = this.store.select((state) => state.executions.filters);
+  startDate: Date;
+  constructor(private store: Store<AppState>) {}
 
-  ngOnInit() {
-    combineLatest([
-      this.authService.user$.pipe(filter((v) => !!v)),
-      this.statusFilter$,
-      this.startDate$,
-      this.endDate$.pipe(filter((date) => !!date)),
-    ])
-      .pipe(
-        mergeMap(([auth, status, startDate, endDate]) =>
-          this.runsService.getRunsRunsGet(
-            undefined,
-            status,
-            startDate.toISODate()!,
-            endDate.plus({ days: 1 }).toISODate()!
-          )
-        )
-      )
-      .subscribe((executions) => {
-        this.executions = executions;
-      });
+  isDisabled(thisOne: boolean, thatOne: boolean) {
+    return thisOne && !thatOne;
   }
 
-  protected setStatusFilter() {
-    if (this.includeRunningExecutions && this.includeFinishedExecutions) {
-      this.statusFilter$.next(undefined);
-    } else {
-      this.statusFilter$.next(this.includeFinishedExecutions);
-    }
-  }
-
-  protected isDisabled(currentValue: boolean) {
-    return (
-      this.includeFinishedExecutions != this.includeRunningExecutions &&
-      currentValue
+  toggleIncludeFinished(includeFinished: boolean, filters: any) {
+    this.store.dispatch(
+      ExecutionsFiltersActions.setFilters({ ...filters, includeFinished })
     );
   }
 
-  protected setDates(
-    event: MatDatepickerInputEvent<any, DateRange<any>>,
-    target: Subject<DateTime>
-  ) {
-    target.next(event.value);
+  toggleIncludeRunning(includeRunning: boolean, filters: any) {
+    this.store.dispatch(
+      ExecutionsFiltersActions.setFilters({ ...filters, includeRunning })
+    );
+  }
+
+  setStartDate(startDate: any) {
+    this.startDate = startDate;
+  }
+
+  setEndDate(endDate: any, filters: any) {
+    if (endDate) {
+      this.store.dispatch(
+        ExecutionsFiltersActions.setFilters({
+          ...filters,
+          startDate: this.startDate,
+          endDate,
+        })
+      );
+    }
   }
 }

@@ -1,29 +1,37 @@
 <div class="wrapper">
-    <div>Include</div>
-    <div class="filters">
-        <mat-checkbox [(ngModel)]="includeRunningExecutions"
-            (change)="setStatusFilter()"
-            [disabled]="isDisabled(includeRunningExecutions)">Running
-            executions</mat-checkbox>
-        <mat-checkbox [(ngModel)]="includeFinishedExecutions"
-            (change)="setStatusFilter()"
-            [disabled]="isDisabled(includeFinishedExecutions)">Finished
-            executions</mat-checkbox>
-        <mat-form-field>
-            <mat-label>Enter a date range</mat-label>
-            <mat-date-range-input [rangePicker]="picker">
-                <input [value]="startDate$ | async"
-                    (dateChange)="setDates($event, startDate$)" matStartDate
-                    placeholder="Start date">
-                <input [value]="endDate$ | async"
-                    (dateChange)="setDates($event, endDate$)"
-                    matEndDate placeholder="End date">
-            </mat-date-range-input>
-            <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
-            <mat-datepicker-toggle matIconSuffix
-                [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
-        </mat-form-field>
-    </div>
-    <app-executions-list [executions]="executions"></app-executions-list>
+    <mat-card appearance="outlined" class="filters-card">
+        <mat-card-header>
+            <mat-card-title>Filters</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="filters" *ngIf="filters$ | async; let filters">
+                <mat-checkbox [checked]="filters.includeRunning"
+                    (change)="toggleIncludeRunning($event.checked, filters)"
+                    [disabled]="isDisabled(filters.includeRunning, filters.includeFinished)">Running
+                    executions</mat-checkbox>
+                <mat-checkbox [checked]="filters.includeFinished"
+                    (change)="toggleIncludeFinished($event.checked, filters)"
+                    [disabled]="isDisabled(filters.includeFinished, filters.includeRunning)">Finished
+                    executions</mat-checkbox>
+                <mat-form-field>
+                    <mat-label>Enter a date range</mat-label>
+                    <mat-date-range-input [rangePicker]="picker">
+                        <input [value]="filters.startDate"
+                            (dateChange)="setStartDate($event.value)"
+                            matStartDate
+                            placeholder="Start date">
+                        <input [value]="filters.endDate"
+                            (dateChange)="setEndDate($event.value, filters)"
+                            matEndDate placeholder="End date">
+                    </mat-date-range-input>
+                    <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix
+                        [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <app-executions-list
+        [executions]="(executions$ | async)!"></app-executions-list>
 </div>
