@@ -1,0 +1,14 @@
+<mat-form-field>
+    <mat-label>Status</mat-label>
+    <mat-select [value]="status$ | async"
+        (selectionChange)="setStatus($event)">
+        @for (status of statuses; track status) {
+        <mat-option [value]="status">{{status}}</mat-option>
+        }
+    </mat-select>
+</mat-form-field>
+<mat-form-field class="id-container">
+    <mat-label>Ids</mat-label>
+    <textarea [(ngModel)]="ids" (input)="parseInput()"
+        matInput></textarea>
+</mat-form-field>

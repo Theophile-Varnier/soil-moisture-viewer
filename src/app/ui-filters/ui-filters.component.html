@@ -1,0 +1,20 @@
+<div class="filter-menu">
+    <div class="sidenav-wrapper">
+        <button mat-mini-fab class="filter-toggle"
+            (click)="panelOpen = !panelOpen">
+            <mat-icon>tune</mat-icon>
+        </button>
+        <div class="aggregations-background" [class.open]="panelOpen">
+            <mat-tab-group><mat-tab label="Aggregations">
+                    <div class="aggregations-wrapper">
+                        <div class="aggregation-line"
+                            *ngFor="let aggregation of (aggregations$ | async)"
+                            [class.selected]>
+                            {{aggregation.id}}
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>
