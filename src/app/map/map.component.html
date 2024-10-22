@@ -1,2 +1,7 @@
-<app-ui-filters></app-ui-filters>
+<app-refresh-button (refresh)="refresh()"></app-refresh-button>
+<app-clear-button (clear)="clear()"></app-clear-button>
+<app-ui-data-selector></app-ui-data-selector>
+<app-data-info></app-data-info>
+<app-job-creator (drawOnMap)="showDrawer()" [(aoi)]="aoi" [(aois)]="aois"
+    (generateAois)="generateAois($event)"></app-job-creator>
 <div id="map" class="map"></div>

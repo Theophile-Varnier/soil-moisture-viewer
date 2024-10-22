@@ -1,0 +1,33 @@
+.filter-menu {
+    pointer-events: none;
+    position:absolute;
+    top: calc(25% - 40px);
+    right: 0;
+    z-index: 500;
+    &.focused {
+        z-index: 900;
+    }
+    button.filter-toggle {
+        pointer-events: all;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+.aggregations-background {
+    pointer-events: all;
+    flex: 1 1 auto;
+    background-color: black;
+    padding: 20px;
+    height: 50vh;
+    overflow: auto;
+}
+
+.sidenav-wrapper {
+    display: flex;
+    transform: translateX(calc(100% - 40px));
+    transition: transform .5s ease-in-out;
+    &.open {
+        transform: translateX(0);
+    }
+}

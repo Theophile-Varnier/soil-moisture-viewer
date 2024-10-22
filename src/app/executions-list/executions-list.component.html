@@ -7,15 +7,36 @@
                     href="{{'https://eu-west-1.console.aws.amazon.com/batch/home?region=eu-west-1#jobs/fargate/detail/' + job.id}}">{{job.id}}</a>
             </td>
         </ng-container>
-        @for (column of displayedColumns; track column) {
-        <ng-container matColumnDef="{{column}}">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                {{columnsLabel[column]}}
-            </th>
-            <td mat-cell *matCellDef="let execution"> {{execution[column]}}
-            </td>
+        <ng-container matColumnDef="productType">
+            <th mat-header-cell *matHeaderCellDef> Product Type </th>
+            <td mat-cell *matCellDef="let job"> {{job.productType}}</td>
         </ng-container>
-        }
+        <ng-container matColumnDef="executionStartDate">
+            <th mat-header-cell *matHeaderCellDef> Execution start date </th>
+            <td mat-cell *matCellDef="let job">
+                {{job.executionStartDate.toISO({ suppressMilliseconds: true,
+                includeOffset: false })}}</td>
+        </ng-container>
+        <ng-container matColumnDef="executionEndDate">
+            <th mat-header-cell *matHeaderCellDef> Execution end date </th>
+            <td mat-cell *matCellDef="let job">
+                {{job.executionEndDate && job.executionEndDate.toISO({
+                suppressMilliseconds: true,
+                includeOffset: false })}}</td>
+        </ng-container>
+        <ng-container matColumnDef="year">
+            <th mat-header-cell *matHeaderCellDef> Year </th>
+            <td mat-cell *matCellDef="let job">
+                {{job.startDate.year}}</td>
+        </ng-container>
+        <ng-container matColumnDef="result">
+            <th mat-header-cell *matHeaderCellDef> Result </th>
+            <td mat-cell *matCellDef="let job"> {{job.result}}</td>
+        </ng-container>
+        <ng-container matColumnDef="rerun">
+            <th mat-header-cell *matHeaderCellDef> Rerun </th>
+            <td mat-cell *matCellDef="let job"> {{job.rerun}}</td>
+        </ng-container>
         <ng-container matColumnDef="jobs">
             <th mat-header-cell *matHeaderCellDef> Jobs </th>
             <td mat-cell *matCellDef="let job">
@@ -39,8 +60,8 @@
                 }
             </td>
         </ng-container>
-        <tr mat-header-row *matHeaderRowDef="allColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: allColumns;"
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
             [class.errored]="row.result === 'ERROR'"
             [class.running]="!row.result"></tr>
     </table>

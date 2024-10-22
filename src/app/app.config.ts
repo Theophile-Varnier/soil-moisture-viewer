@@ -15,6 +15,9 @@ import { JobsEffects } from './store/jobs/effects';
 import { executionsReducer } from './store/executions/reducer';
 import { ExecutionsEffects } from './store/executions/effects';
 import { uiReducer } from './store/ui/reducer';
+import { UiEffects } from './store/ui/effects';
+import { filtersReducer } from './store/filters/reducer';
+import { FiltersEffects } from './store/filters/effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,7 +37,14 @@ export const appConfig: ApplicationConfig = {
     provideState({ name: 'auth', reducer: authReducer }),
     provideState({ name: 'executions', reducer: executionsReducer }),
     provideState({ name: 'ui', reducer: uiReducer }),
-    provideEffects(AuthEffects, JobsEffects, ExecutionsEffects),
+    provideState({ name: 'filters', reducer: filtersReducer }),
+    provideEffects(
+      AuthEffects,
+      JobsEffects,
+      ExecutionsEffects,
+      UiEffects,
+      FiltersEffects
+    ),
     provideStoreDevtools({
       name: 'Soil Moisture Viewer',
       maxAge: 30,

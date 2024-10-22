@@ -1,25 +1,21 @@
 <div *ngIf="selectedJobsIds$ | async; let selectedJobsIds">
-    <mat-form-field>
-        <mat-label>Columns</mat-label>
-        <mat-select [(ngModel)]="displayedLabels"
-            (selectionChange)="updateSelection()" multiple>
-            @for (column of availableColumns; track column) {
-            <mat-option [value]="column">{{column}}</mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
-    <!-- <div
-        style="display: flex; align-items: center;"
-        [ngStyle]="{'visibility':(jobsService.loading$ | async) ? 'visible': 'hidden'}">
-        <span>Loading...</span>
-        <mat-progress-spinner
-            color="primary"
-            mode="indeterminate" [diameter]="14">
-        </mat-progress-spinner>
-    </div> -->
+    <div class="actions-menu"
+        *ngIf="selectedJobs$ | async as selectedJobs">
+        <div></div>
+        <button mat-flat-button [matMenuTriggerFor]="menu"
+            [disabled]="!selectedJobs.length">Actions</button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item
+                (click)="rerunJobs()">Rerun</button>
+            <button mat-menu-item
+                (click)="updateJobsStatus(jobStatus.Active)">Activate</button>
+            <button mat-menu-item
+                (click)="updateJobsStatus(jobStatus.Inactive)">Deactivate</button>
+        </mat-menu>
+    </div>
     <table mat-table matSort multiTemplateDataRows [dataSource]="dataSource"
         class="mat-elevation-z8">
-        @for (column of displayedLabels; track column) {
+        @for (column of availableColumns; track column) {
         <ng-container matColumnDef="{{column}}">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 {{columnsLabel[column]}}

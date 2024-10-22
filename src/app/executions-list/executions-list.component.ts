@@ -28,46 +28,46 @@ import { ExecutionTableDto } from './execution-table';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExecutionsListComponent {
-  displayedColumns: string[] = [
+  private _displayedColumns: string[] = [
+    'id',
     'productType',
     'executionStartDate',
     'executionEndDate',
-    'startDate',
-    'endDate',
+    'year',
     'result',
     'rerun',
+    'jobs',
+    'errors',
   ];
 
-  columnsLabel: Record<string, string> = {
-    id: 'Id',
-    productType: 'Product Type',
-    executionStartDate: 'Execution start date',
-    executionEndDate: 'Execution end date',
-    startDate: 'Period start date',
-    endDate: 'Period end date',
-    result: 'Result',
-    rerun: 'Rerun',
-    jobs: 'Jobs',
-    errors: 'Errors',
-  };
+  private _displayedColumnsLight: string[] = [
+    'id',
+    'productType',
+    'year',
+    'errors',
+  ];
 
-  allColumns: string[];
+  displayedColumns: string[];
 
   dataSource = new MatTableDataSource<ExecutionTableDto>();
 
   executions = input.required<JobExecutionCreated[]>();
 
+  light = input<boolean>();
+
   @ViewChild(MatSort) sort?: MatSort;
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   constructor() {
-    this.allColumns = Object.keys(this.columnsLabel);
     effect(() => {
       this.dataSource.data = this.executions().map(
         (e) => new ExecutionTableDto(e)
       );
       this.dataSource.sort = this.sort!;
       this.dataSource.paginator = this.paginator!;
+      this.displayedColumns = this.light()
+        ? this._displayedColumnsLight
+        : this._displayedColumns;
     });
   }
 }

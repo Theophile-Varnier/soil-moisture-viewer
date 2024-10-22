@@ -26,5 +26,6 @@ export * from './polygon';
 export * from './priority';
 export * from './productSubType';
 export * from './productType';
+export * from './sentryError';
 export * from './user';
 export * from './validationError';

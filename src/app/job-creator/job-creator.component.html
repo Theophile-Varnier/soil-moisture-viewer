@@ -1,0 +1,95 @@
+<div class="filter-menu">
+    <div class="sidenav-wrapper" [class.open]="panelOpen">
+        <button matTooltip="Create job(s)" [matTooltipPosition]="'before'"
+            mat-mini-fab class="filter-toggle"
+            (click)="panelOpen = !panelOpen">
+            <mat-icon>add</mat-icon>
+        </button>
+        <div class="filters">
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title> Create new job </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <form>
+                        <div class="job-form">
+                            <mat-form-field>
+                                <mat-label>Name</mat-label>
+                                <input [(ngModel)]="name" matInput
+                                    color="primary"
+                                    name="name" />
+                            </mat-form-field>
+                            <app-year-picker
+                                [label]="'Start year'"
+                                [(date)]="startDate"></app-year-picker>
+                            <mat-form-field>
+                                <mat-label>Product Type</mat-label>
+                                <mat-select [(value)]="selectedProductType">
+                                    @for (type of productType; track type) {
+                                    <mat-option
+                                        [value]="type">{{type}}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field class="id-container">
+                                <mat-label>Aoi</mat-label>
+                                <textarea name="aoi"
+                                    matInput
+                                    [(ngModel)]="aoiString"></textarea>
+                                <button matTooltip="Draw on map"
+                                    (click)="drawOnMap.emit()"
+                                    matTooltipPosition="before" mat-mini-fab>
+                                    <mat-icon>map</mat-icon>
+                                </button>
+                            </mat-form-field>
+                            <button type="submit" mat-flat-button
+                                color="primary"
+                                (click)="createSingleJob()">Create</button>
+                        </div>
+                    </form>
+                </mat-expansion-panel>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title> Batch create jobs </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <form>
+                        <div class="job-form">
+                            <mat-form-field>
+                                <mat-label>Number</mat-label>
+                                <input type="number" [(ngModel)]="numberOfJobs"
+                                    matInput
+                                    color="primary"
+                                    name="name" />
+                            </mat-form-field>
+                            <app-year-picker
+                                [label]="'Start year'"
+                                [(date)]="startDate"></app-year-picker>
+                            <mat-form-field>
+                                <mat-label>Product Type</mat-label>
+                                <mat-select [(value)]="selectedProductType">
+                                    @for (type of productType; track type) {
+                                    <mat-option
+                                        [value]="type">{{type}}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-checkbox name="bbox"
+                                [(ngModel)]="keepBbox">Keep the
+                                current location</mat-checkbox>
+                            <div>
+                                <button type="button" mat-flat-button
+                                    (click)="generateAois.emit({numberOfJobs, keepBbox})">Generate
+                                    aois</button>
+                                <button type="submit"
+                                    [disabled]="!aois()?.length" mat-flat-button
+                                    (click)="createMultipleJobs()"
+                                    color="primary">Create</button>
+                            </div>
+                        </div>
+                    </form>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+
+    </div>
+</div>

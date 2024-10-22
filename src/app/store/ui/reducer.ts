@@ -1,22 +1,30 @@
 import { createReducer, on } from '@ngrx/store';
 import { UiActions } from './actions';
+import { JobsActions } from '../jobs/actions';
+import { Aggregation } from '../executions/reducer';
 
 export interface UiState {
-  selectedAggregations: string[];
+  selectedAggregation?: Aggregation;
+  layers: any[];
 }
 
 export const initialState: UiState = {
-  selectedAggregations: [],
+  selectedAggregation: undefined,
+  layers: [],
 };
 
 export const uiReducer = createReducer(
   initialState,
-  on(UiActions.toggleAggregation, (state, { id }) => {
+  on(UiActions.selectAggregation, (state, { aggregation }) => {
     return {
       ...state,
-      selectedAggregations: state.selectedAggregations.includes(id)
-        ? state.selectedAggregations.filter((aggId) => aggId !== id)
-        : [...state.selectedAggregations, id],
+      selectedAggregation: aggregation,
+    };
+  }),
+  on(UiActions.aggregationJobsLoaded, (state, { jobs }) => {
+    return {
+      ...state,
+      layers: jobs.map((job) => job.aoi),
     };
   })
 );

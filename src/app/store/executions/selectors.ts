@@ -1,25 +1,85 @@
 import { createSelector } from '@ngrx/store';
 import { AppState } from '../state';
-import { areEquals } from '../../helpers';
 import { Aggregation } from './reducer';
+import { DateTime } from 'luxon';
 
 const executionsSelector = (state: AppState) => state.executions.executions;
+const filtersSelector = (state: AppState) => state.filters;
+
+const displayedExecutionsSelector = createSelector(
+  executionsSelector,
+  filtersSelector,
+  (executions, filters) =>
+    !filters.ui.error && !filters.ui.ids.length
+      ? executions
+      : executions.filter(
+          (execution) =>
+            (!filters.ui.error ||
+              execution.errors?.find(
+                (e) =>
+                  e.id
+                    ?.toLowerCase()
+                    .includes(filters.ui.error.toLowerCase()) ||
+                  e.message
+                    ?.toLowerCase()
+                    .includes(filters.ui.error.toLowerCase()) ||
+                  e.name?.toLowerCase().includes(filters.ui.error.toLowerCase())
+              )) &&
+            (!filters.ui.ids.length ||
+              execution.jobs.some((job) => filters.ui.ids.includes(job)))
+        )
+);
 
 export const aggregationsSelector = createSelector(
-  executionsSelector,
+  displayedExecutionsSelector,
   (executions) =>
     executions.reduce<Aggregation[]>((acc, execution) => {
-      for (const agg of acc) {
-        if (areEquals(agg.jobs, execution.jobs)) {
-          agg.executions.push(execution);
-          return acc;
+      let previousAggregation: Aggregation | undefined = undefined;
+      for (const job of execution.jobs) {
+        const jobAggregation = acc.find((agg) => agg.jobs.includes(job));
+        if (!jobAggregation && !previousAggregation) {
+          previousAggregation = {
+            id: execution.id,
+            jobs: execution.jobs,
+            executions: [],
+            start: DateTime.fromISO(execution.startDate),
+            end: DateTime.fromISO(execution.endDate),
+          };
+          acc.push(previousAggregation);
+        } else if (
+          previousAggregation &&
+          jobAggregation &&
+          previousAggregation !== jobAggregation
+        ) {
+          previousAggregation.executions.push(...jobAggregation.executions);
+          acc = acc.filter((agg) => agg !== jobAggregation);
+        } else {
+          previousAggregation = previousAggregation || jobAggregation!;
         }
+        if (
+          !previousAggregation.executions.find((e) => e.id === execution.id)
+        ) {
+          previousAggregation.executions.push(execution);
+        }
+        if (
+          execution.jobs.length >= previousAggregation.jobs.length &&
+          execution.geoLocation
+        ) {
+          const geoLocation = execution.geoLocation as any;
+          previousAggregation.geoLocation = `${geoLocation.toponymName}, ${geoLocation.adminName1}, ${geoLocation.countryName}`;
+        }
+
+        previousAggregation.start = DateTime.min(
+          ...previousAggregation.executions.map((e) =>
+            DateTime.fromISO(e.startDate)
+          )
+        );
+        previousAggregation.end = DateTime.max(
+          ...previousAggregation.executions.map((e) =>
+            DateTime.fromISO(e.endDate)
+          )
+        );
       }
-      acc.push({
-        id: execution.id,
-        jobs: execution.jobs,
-        executions: [execution],
-      });
       return acc;
     }, [])
 );

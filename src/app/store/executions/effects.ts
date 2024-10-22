@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
-import {
-  Actions,
-  createEffect,
-  ofType,
-  ROOT_EFFECTS_INIT,
-} from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { AppState } from '../state';
-import { ExecutionsActions, ExecutionsFiltersActions } from './actions';
-import { combineLatest, map, mergeMap } from 'rxjs';
+import { ExecutionsActions } from './actions';
+import { combineLatest, map, mergeMap, withLatestFrom } from 'rxjs';
 import { DateTime } from 'luxon';
 import { authenticatedUserSelector } from '../auth/selectors';
 import { RunsService } from '../../api-client';
+import { UiActions } from '../ui/actions';
+import { FiltersActions } from '../filters/actions';
 
 @Injectable()
 export class ExecutionsEffects {
@@ -21,36 +18,22 @@ export class ExecutionsEffects {
     private runsService: RunsService
   ) {}
 
-  init = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ROOT_EFFECTS_INIT),
-      map(() =>
-        ExecutionsFiltersActions.setFilters({
-          includeFinished: true,
-          includeRunning: true,
-          startDate: DateTime.now()
-            .startOf('day')
-            .minus({ weeks: 1 })
-            .toJSDate(),
-          endDate: DateTime.now().startOf('day').toJSDate(),
-        })
-      )
-    )
-  );
-
   fetchExecutions = createEffect(() =>
     combineLatest([
-      this.actions$.pipe(ofType(ExecutionsFiltersActions.setFilters)),
+      this.actions$.pipe(
+        ofType(FiltersActions.setExecutionsFilters, UiActions.refresh)
+      ),
       authenticatedUserSelector(this.store),
     ]).pipe(
-      mergeMap(([action, user]) =>
+      withLatestFrom(this.store.select((state) => state.filters.executions)),
+      mergeMap(([action, filters]) =>
         this.runsService.getRunsRunsGet(
           undefined,
-          action.includeRunning && action.includeFinished
+          filters.includeRunning && filters.includeFinished
             ? undefined
-            : action.includeFinished,
-          DateTime.fromJSDate(action.startDate).toISODate()!,
-          DateTime.fromJSDate(action.endDate).plus({ days: 1 }).toISODate()!
+            : filters.includeFinished,
+          DateTime.fromJSDate(filters.startDate).toISODate()!,
+          DateTime.fromJSDate(filters.endDate).plus({ days: 1 }).toISODate()!
         )
       ),
       map((executions) => ExecutionsActions.executionsLoaded({ executions }))

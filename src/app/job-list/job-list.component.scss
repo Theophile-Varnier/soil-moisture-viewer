@@ -14,7 +14,7 @@ table {
     background-color: rgb(245, 245, 220, .5);
   }
 
-  td:last-child{
+  th:last-child, td:last-child{
     padding-left: 0;
     padding-right: 0;
   }
@@ -31,4 +31,12 @@ table {
   .table-wrapper {
     max-height: 50vh;
     overflow: auto;
+}
+
+.actions-menu {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

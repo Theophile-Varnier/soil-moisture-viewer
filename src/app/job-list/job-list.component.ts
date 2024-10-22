@@ -1,16 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnDestroy,
+  effect,
+  input,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { JobTableDto } from './job-table';
-import { Subscription, tap } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule } from '@angular/forms';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -28,8 +29,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ExecutionsListComponent } from '../executions-list/executions-list.component';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/state';
-import { jobsTableSelector } from '../store/jobs/selectors';
 import { JobsActions } from '../store/jobs/actions';
+import { JobDto, JobStatus } from '../api-client';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-job-list',
@@ -47,6 +49,7 @@ import { JobsActions } from '../store/jobs/actions';
     FormsModule,
     MatIconModule,
     ExecutionsListComponent,
+    MatMenuModule,
   ],
   templateUrl: './job-list.component.html',
   styleUrl: './job-list.component.scss',
@@ -62,7 +65,8 @@ import { JobsActions } from '../store/jobs/actions';
     ]),
   ],
 })
-export class JobListComponent implements OnDestroy, OnInit {
+export class JobListComponent {
+  jobStatus = JobStatus;
   availableColumns: string[] = [
     'id',
     'name',
@@ -74,17 +78,17 @@ export class JobListComponent implements OnDestroy, OnInit {
     'errored',
     'lastExecution',
   ];
+  displayedColumnsLight: string[] = ['id', 'name', 'productType', 'subType'];
   displayedColumns: string[];
-  displayedLabels: string[];
   dataSource = new MatTableDataSource<JobTableDto>();
-  private jobsSubscription?: Subscription;
-  private mandatoryColumns: string[] = ['actions', 'expand'];
+
+  light = input<boolean>();
 
   columnsLabel: Record<string, string> = {
     id: 'Id',
     name: 'Name',
     productType: 'Product type',
-    subType: 'Subtype',
+    subType: 'Landsat level',
     status: 'Status',
     startDate: 'Start date',
     endDate: 'End date',
@@ -96,6 +100,8 @@ export class JobListComponent implements OnDestroy, OnInit {
 
   expandedJob?: JobTableDto;
 
+  selectedJobs$ = this.store.select((state) => state.jobs.selectedJobsIds);
+
   private numberOfSelectedJobs = 0;
 
   selectedJobsIds$ = this.store
@@ -103,29 +109,23 @@ export class JobListComponent implements OnDestroy, OnInit {
     .pipe(tap((ids) => (this.numberOfSelectedJobs = ids.length)));
 
   constructor(private store: Store<AppState>) {
-    this.displayedLabels = [...this.availableColumns];
-    this.displayedColumns = [...this.displayedLabels, ...this.mandatoryColumns];
+    effect(() => {
+      this.dataSource.data = this.jobs().map((j) => new JobTableDto(j));
+
+      this.dataSource.sort = this.sort!;
+      this.dataSource.paginator = this.paginator!;
+      if (this.light()) {
+        this.displayedColumns = [...this.displayedColumnsLight, 'actions'];
+      } else {
+        this.displayedColumns = [...this.availableColumns, 'actions', 'expand'];
+      }
+    });
   }
 
-  ngOnInit() {
-    this.jobsSubscription = this.store
-      .select(jobsTableSelector)
-      .subscribe((jobs) => {
-        this.dataSource.data = jobs;
-
-        this.dataSource.sort = this.sort!;
-        this.dataSource.paginator = this.paginator!;
-      });
-  }
+  jobs = input.required<JobDto[]>();
 
   @ViewChild(MatSort) sort?: MatSort;
   @ViewChild(MatPaginator) paginator?: MatPaginator;
-
-  ngOnDestroy() {
-    if (this.jobsSubscription) {
-      this.jobsSubscription.unsubscribe();
-    }
-  }
 
   protected toggleSelectAll(selected: boolean) {
     this.store.dispatch(
@@ -157,7 +157,11 @@ export class JobListComponent implements OnDestroy, OnInit {
     );
   }
 
-  protected updateSelection() {
-    this.displayedColumns = [...this.displayedLabels, ...this.mandatoryColumns];
+  protected rerunJobs() {
+    this.store.dispatch(JobsActions.rerunJobs());
+  }
+
+  protected updateJobsStatus(status: JobStatus) {
+    this.store.dispatch(JobsActions.updateJobsStatus({ status }));
   }
 }

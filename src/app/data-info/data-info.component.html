@@ -1,0 +1,25 @@
+<div class="filter-menu"
+    [class.focused]="panelOpen">
+    <div class="sidenav-wrapper" [class.open]="panelOpen">
+        <button matTooltip="Show data" [matTooltipPosition]="'before'"
+            mat-mini-fab class="filter-toggle"
+            (click)="panelOpen = !panelOpen">
+            <mat-icon>table_rows</mat-icon>
+        </button>
+        <div class="aggregations-background">
+            <ng-container *ngIf="aggregation$ | async as aggregation">
+                <mat-tab-group>
+                    <mat-tab label="Executions">
+                        <app-executions-list [light]="true"
+                            [executions]="aggregation.executions"></app-executions-list>
+                    </mat-tab>
+                    <mat-tab label="Jobs">
+                        <app-job-list *ngIf="jobs$ | async as jobs"
+                            [light]="true"
+                            [jobs]="jobs"></app-job-list>
+                    </mat-tab>
+                </mat-tab-group>
+            </ng-container>
+        </div>
+    </div>
+</div>

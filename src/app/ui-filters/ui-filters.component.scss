@@ -1,50 +1,30 @@
 .filter-menu {
     position:absolute;
-    top: 10px;
-    right: 0;
-    z-index: 1000;
-    height: 100%;
-    button.filter-toggle {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+    top: 25%;
+    left: 0;
+    z-index: 500;
+    &.focused {
+        z-index: 900;
     }
-}
-
-.aggregations-wrapper {
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid #ccc outset;
-    background-color: #f9f9f9;
-    color: black;
-    .aggregation-line {
-        border: 1px solid transparent outset;
-        text-wrap: nowrap;
-        overflow-x: hidden;
-        cursor: default;
-        &.selected {
-            border: 1px solid #ccc outset;
-            background-color: cornflowerblue;
-            color: white;
-        }
+    button.filter-toggle {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
     }
 }
 
 .aggregations-background {
     flex: 1 1 auto;
     background-color: black;
-    max-width: 0;
-    transition: max-width 1s ease-in-out;
-    &.open {
-        max-width: 100vw;
-    }
-}
-
-.aggregations-header {
-    text-align: center;
-    padding: 10px;
-    padding-bottom: 0;
+    padding: 20px;
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 .sidenav-wrapper {
     display: flex;
+    transform: translateX(calc(-100% + 40px));
+    transition: transform .5s ease-in-out;
+    &.open {
+        transform: translateX(0);
+    }
 }

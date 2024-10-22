@@ -38,6 +38,7 @@ model/polygon.ts
 model/priority.ts
 model/productSubType.ts
 model/productType.ts
+model/sentryError.ts
 model/user.ts
 model/validationError.ts
 param.ts

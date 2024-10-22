@@ -11,6 +11,7 @@ import { JobListComponent } from './job-list/job-list.component';
 import { AuthComponent } from './auth/auth.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { UiFiltersComponent } from './ui-filters/ui-filters.component';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     RouterModule,
     RouterLink,
     RouterLinkActive,
+    UiFiltersComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

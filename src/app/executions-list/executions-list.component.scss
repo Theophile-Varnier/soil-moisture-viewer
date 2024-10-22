@@ -4,7 +4,7 @@ a, a:visited, a:hover, a:active {
 
 table.mat-mdc-table {
     .mat-mdc-row {
-        height: auto;
+        height: 50px;
     }
 
     .errored {
@@ -12,7 +12,7 @@ table.mat-mdc-table {
     }
 
     .running {
-        background-color: rgba(209, 209, 87, 0.5);
+        background-color: #d1b257;
     }
 }
 

@@ -1,39 +1,23 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { JobsService } from './jobs.service';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { JobListComponent } from '../job-list/job-list.component';
-import { JobTableDto } from '../job-list/job-table';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonModule } from '@angular/material/button';
-import { JobStatus } from '../api-client';
 import { MatCardModule } from '@angular/material/card';
-import { JobsFiltersComponent } from '../jobs-filters/jobs-filters.component';
+import { Store } from '@ngrx/store';
+import { AppState } from '../store/state';
+import { CommonModule } from '@angular/common';
+import { filteredJobsSelector } from '../store/jobs/selectors';
 
 @Component({
   selector: 'app-jobs',
   standalone: true,
-  imports: [
-    MatButtonModule,
-    JobListComponent,
-    JobsFiltersComponent,
-    MatMenuModule,
-    MatCardModule,
-  ],
+  imports: [CommonModule, JobListComponent, MatCardModule],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class JobsComponent {
-  jobStatus = JobStatus;
+export class JobsComponent implements OnInit {
+  constructor(private store: Store<AppState>) {}
 
-  selectedJobs: JobTableDto[] = [];
+  jobs$ = this.store.select(filteredJobsSelector);
 
-  constructor(protected jobsService: JobsService) {}
-
-  protected rerunJobs() {
-    this.jobsService.rerunJobs(this.selectedJobs);
-  }
-
-  protected updateJobsStatus(status: JobStatus) {
-    this.jobsService.setJobsStatus(this.selectedJobs, status);
-  }
+  ngOnInit() {}
 }

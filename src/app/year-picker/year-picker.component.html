@@ -1,0 +1,10 @@
+<mat-form-field>
+    <mat-label>{{label()}}</mat-label>
+    <input matInput [matDatepicker]="dp" [formControl]="dateControl">
+    <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+    <mat-datepicker #dp
+        startView="multi-year"
+        (yearSelected)="setYear($event, dp)"
+        panelClass="year-picker">
+    </mat-datepicker>
+</mat-form-field>

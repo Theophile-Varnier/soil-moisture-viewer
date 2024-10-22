@@ -1,0 +1,10 @@
+.wrapper {
+    position: absolute;
+    right:0;
+    top: calc(25% - 80px);
+    z-index: 500;
+    button {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}

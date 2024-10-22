@@ -3,11 +3,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/state';
-import { JobsFiltersActions } from '../store/jobs/actions';
 import { JobStatus } from '../api-client';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { tap } from 'rxjs';
+import { FiltersActions } from '../store/filters/actions';
+import { UiFiltersState } from '../store/filters/reducer';
 
 @Component({
   selector: 'app-jobs-filters',
@@ -26,7 +27,10 @@ import { Observable } from 'rxjs';
 export class JobsFiltersComponent {
   statuses = [JobStatus.Active, JobStatus.Inactive, JobStatus.Running];
   protected ids: string = '';
-  status$ = this.store.select((state) => state.jobs.statusFilter);
+  filters$ = this.store
+    .select((state) => state.filters.ui)
+    .pipe(tap((s) => (this.selectedStatus = s.status)));
+  selectedStatus: JobStatus[] = [];
   idRegex = new RegExp(
     '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}',
     'g'
@@ -34,16 +38,17 @@ export class JobsFiltersComponent {
 
   constructor(private store: Store<AppState>) {}
 
-  setStatus(status: MatSelectChange) {
+  setStatus(status: MatSelectChange, filters: UiFiltersState) {
     this.store.dispatch(
-      JobsFiltersActions.selectStatus({
-        status: status.value,
+      FiltersActions.setUiFilters({
+        ...filters,
+        status: this.selectedStatus,
       })
     );
   }
 
-  protected parseInput() {
+  protected parseInput(filters: UiFiltersState) {
     const ids = this.ids.match(this.idRegex) ?? [];
-    this.store.dispatch(JobsFiltersActions.selectIds({ ids }));
+    this.store.dispatch(FiltersActions.setUiFilters({ ...filters, ids }));
   }
 }

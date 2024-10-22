@@ -1,0 +1,35 @@
+<div class="filters" *ngIf="filters$ | async; let filters">
+    <mat-form-field>
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+            <input [value]="filters.executions.startDate"
+                (dateChange)="setStartDate($event.value)"
+                matStartDate
+                placeholder="Start date">
+            <input [value]="filters.executions.endDate"
+                (dateChange)="setEndDate($event.value, filters.executions)"
+                matEndDate placeholder="End date">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix
+            [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+    <mat-button-toggle-group
+        name="executions"
+        aria-label="Executions"
+        [hideMultipleSelectionIndicator]="true"
+        [value]="includedExecutions$ | async"
+        (change)="setExecutionsFilters($event, filters.executions)"
+        multiple>
+        <mat-button-toggle value="Running"
+            [disabled]="isDisabled(filters.executions.includeRunning, filters.executions.includeFinished)">Running</mat-button-toggle>
+        <mat-button-toggle value="Finished"
+            [disabled]="isDisabled(filters.executions.includeFinished, filters.executions.includeRunning)">Finished</mat-button-toggle>
+    </mat-button-toggle-group>
+    <mat-form-field>
+        <mat-label>Error</mat-label>
+        <input matInput color="primary" [value]="filters.ui.error"
+            (input)="setError($event, filters.ui)"
+            name="errors" />
+    </mat-form-field>
+</div>

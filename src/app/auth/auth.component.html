@@ -7,10 +7,12 @@
 <ng-template #auth_form>
     <form class="auth-form">
         <mat-form-field>
-            <mat-label>API url</mat-label>
-            <input matInput color="primary"
-                [(ngModel)]="apiUrl"
-                name="apiUrl" />
+            <mat-label>Environment</mat-label>
+            <mat-select [(value)]="env">
+                @for (env of envs; track env) {
+                <mat-option [value]="env">{{env.name}}</mat-option>
+                }
+            </mat-select>
         </mat-form-field>
         <mat-form-field>
             <mat-label>API key</mat-label>

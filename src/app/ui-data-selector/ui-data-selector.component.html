@@ -1,0 +1,32 @@
+<div class="filter-menu" [class.focused]="panelOpen">
+    <div class="sidenav-wrapper" [class.open]="panelOpen">
+        <button matTooltip="Show aggregations" [matTooltipPosition]="'before'"
+            mat-mini-fab
+            class="filter-toggle"
+            (click)="panelOpen = !panelOpen">
+            <mat-icon>filter_list</mat-icon>
+        </button>
+        <div class="aggregations-background">
+            <mat-tab-group>
+                <mat-tab label="Aggregations">
+                    <ng-container *ngIf="aggregations$ | async as aggregations">
+                        <div class="aggregations-wrapper"
+                            *ngIf="{value:selectedAggregation$ | async} as selectedAggregation">
+                            <div class="aggregation-line"
+                                *ngFor="let aggregation of aggregations"
+                                [class.selected]="isSelected(aggregation, selectedAggregation.value)"
+                                (click)="selectAggregation(aggregation)">
+                                <span>{{aggregation.geoLocation ??
+                                    aggregation.id}}
+                                    ({{aggregation.jobs.length}})</span>
+                                <span
+                                    style="font-style:italic;">{{aggregation.start.year}}
+                                    - {{aggregation.end.year}}</span>
+                            </div>
+                        </div>
+                    </ng-container>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>
