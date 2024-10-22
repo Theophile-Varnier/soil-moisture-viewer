@@ -70,6 +70,7 @@ export class JobListComponent {
   availableColumns: string[] = [
     'id',
     'name',
+    'createdAt',
     'productType',
     'subType',
     'status',
@@ -87,6 +88,7 @@ export class JobListComponent {
   columnsLabel: Record<string, string> = {
     id: 'Id',
     name: 'Name',
+    createdAt: 'Created at',
     productType: 'Product type',
     subType: 'Landsat level',
     status: 'Status',

@@ -11,7 +11,6 @@ import * as L from 'leaflet';
 import 'leaflet-draw';
 import { ClearButtonComponent } from '../clear-button/clear-button.component';
 import { UiActions } from '../store/ui/actions';
-import { RefreshButtonComponent } from '../refresh-button/refresh-button.component';
 (window as any).type = true;
 
 @Component({
@@ -22,7 +21,6 @@ import { RefreshButtonComponent } from '../refresh-button/refresh-button.compone
     DataInfoComponent,
     JobCreatorComponent,
     ClearButtonComponent,
-    RefreshButtonComponent,
   ],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
@@ -118,10 +116,6 @@ export class MapComponent implements AfterViewInit {
       UiActions.selectAggregation({ aggregation: undefined })
     );
     this.aoi = '';
-  }
-
-  refresh() {
-    this.store.dispatch(UiActions.refresh());
   }
 
   generateAois(event: { numberOfJobs: number; keepBbox: boolean }) {

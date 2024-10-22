@@ -11,6 +11,7 @@
       [active]="activeLink == link"> {{link}} </a>
     }
   </nav>
+  <app-refresh-button (refresh)="refresh()"></app-refresh-button>
   <app-ui-filters></app-ui-filters>
   <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
   <router-outlet />

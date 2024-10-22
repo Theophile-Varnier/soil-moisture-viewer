@@ -28,6 +28,7 @@ html, body {
     @include mat.button-theme($theme);
     @include mat.all-component-themes($theme);
     @include mat.color-variants-backwards-compatibility($theme);
+    --mat-fab-small-disabled-state-container-color: rgba(113, 113, 115, 0.8);
 }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 

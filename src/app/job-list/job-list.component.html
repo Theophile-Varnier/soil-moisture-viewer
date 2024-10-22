@@ -13,7 +13,8 @@
                 (click)="updateJobsStatus(jobStatus.Inactive)">Deactivate</button>
         </mat-menu>
     </div>
-    <table mat-table matSort multiTemplateDataRows [dataSource]="dataSource"
+    <table mat-table matSort matSortActive="createdAt" matSortDirection="desc"
+        multiTemplateDataRows [dataSource]="dataSource"
         class="mat-elevation-z8">
         @for (column of availableColumns; track column) {
         <ng-container matColumnDef="{{column}}">

@@ -1,10 +1,17 @@
 .wrapper {
     position: absolute;
-    right:0;
-    top: calc(25% - 120px);
+    left:0;
+    top: calc(25% - 40px);
     z-index: 500;
     button {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
     }
 }
+
+.rotate {
+    animation: spinner 1.5s linear infinite; 
+  }
+  @keyframes spinner {
+    to { transform: rotate(360deg); }
+  }

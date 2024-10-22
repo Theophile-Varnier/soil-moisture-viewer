@@ -1,16 +1,18 @@
 import { createReducer, on } from '@ngrx/store';
 import { UiActions } from './actions';
-import { JobsActions } from '../jobs/actions';
 import { Aggregation } from '../executions/reducer';
+import { JobsActions } from '../jobs/actions';
 
 export interface UiState {
   selectedAggregation?: Aggregation;
   layers: any[];
+  loading: boolean;
 }
 
 export const initialState: UiState = {
   selectedAggregation: undefined,
   layers: [],
+  loading: false,
 };
 
 export const uiReducer = createReducer(
@@ -25,6 +27,18 @@ export const uiReducer = createReducer(
     return {
       ...state,
       layers: jobs.map((job) => job.aoi),
+    };
+  }),
+  on(UiActions.setLoading, (state, { loading }) => {
+    return {
+      ...state,
+      loading,
+    };
+  }),
+  on(JobsActions.jobsLoaded, (state, { jobs }) => {
+    return {
+      ...state,
+      loading: false,
     };
   })
 );

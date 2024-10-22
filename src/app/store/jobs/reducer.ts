@@ -1,6 +1,8 @@
 import { createReducer, on } from '@ngrx/store';
 import { JobDto } from '../../api-client';
 import { JobsActions } from './actions';
+import { UiActions } from '../ui/actions';
+import { FiltersActions } from '../filters/actions';
 
 export interface JobsState {
   jobs: JobDto[];
@@ -45,5 +47,8 @@ export const jobsReducer = createReducer(
       const updatedJob = jobs.find((j) => j.id === job.id);
       return updatedJob ? updatedJob : job;
     }),
+  })),
+  on(UiActions.refresh, FiltersActions.setExecutionsFilters, (state) => ({
+    ...initialState,
   }))
 );

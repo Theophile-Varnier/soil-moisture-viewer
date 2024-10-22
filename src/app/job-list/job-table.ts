@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import {
   JobDto,
   JobExecutionInfo,
@@ -18,6 +19,7 @@ export class JobTableDto {
   productType: ProductType;
   subType: ProductSubType;
   executions: JobExecutionInfo[] = [];
+  createdAt: string;
 
   constructor(src: JobDto) {
     this.id = src.id;
@@ -27,6 +29,12 @@ export class JobTableDto {
     this.status = src.status;
     this.productType = src.productType;
     this.subType = src.subtype;
+    this.createdAt = DateTime.fromISO(src.createdAt)
+      .set({ millisecond: 0 })
+      .toISO({
+        suppressMilliseconds: true,
+        includeOffset: false,
+      })!;
     this.errored = src.executions.some(
       (e) => e.result === JobExecutionResult.Error
     );

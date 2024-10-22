@@ -39,7 +39,11 @@ export class JobsEffects {
             })
           );
       }),
-      map((jobs) => JobsActions.loadJobs(jobs))
+      map((jobs) =>
+        jobs.ids.length
+          ? JobsActions.loadJobs(jobs)
+          : JobsActions.jobsLoaded({ jobs: jobs.jobs })
+      )
     )
   );
 

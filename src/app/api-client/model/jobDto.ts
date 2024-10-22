@@ -33,6 +33,7 @@ export interface JobDto {
     userId: string;
     rerunPending: boolean;
     subtype: ProductSubType;
+    createdAt: string;
     executions: Array<JobExecutionInfo>;
 }
 export namespace JobDto {

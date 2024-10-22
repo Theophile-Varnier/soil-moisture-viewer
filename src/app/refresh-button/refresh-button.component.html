@@ -1,7 +1,13 @@
-<div class="wrapper">
-    <button matTooltip="Refresh all" [matTooltipPosition]="'before'"
+<div class="wrapper" *ngIf="{loading: loading$ | async}; let loading">
+    <button [disabled]="loading.loading" matTooltip="Refresh all"
+        [matTooltipPosition]="'after'"
         mat-mini-fab
         (click)="refresh.emit()">
+        @if(loading.loading){
+        <mat-icon class="rotate">sync</mat-icon>
+        }
+        @else {
         <mat-icon>refresh</mat-icon>
+        }
     </button>
 </div>
