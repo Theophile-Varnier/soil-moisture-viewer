@@ -14,6 +14,7 @@ import { Store } from '@ngrx/store';
 import { JobsService } from '../../api-client';
 import { FiltersActions } from '../filters/actions';
 import { authenticatedUserSelector } from '../auth/selectors';
+import { selectedAggregation } from './selectors';
 
 @Injectable()
 export class UiEffects {
@@ -35,11 +36,12 @@ export class UiEffects {
   loadAggregationsJobs = createEffect(() =>
     this.actions$.pipe(
       ofType(UiActions.selectAggregation),
-      withLatestFrom(this.store.select((st) => st.jobs.jobs)),
-      mergeMap(([action, jobs]) => {
-        let jobsIds: string[] = action.aggregation
-          ? action.aggregation.jobs
-          : [];
+      withLatestFrom(
+        this.store.select((st) => st.jobs.jobs),
+        this.store.select(selectedAggregation)
+      ),
+      mergeMap(([action, jobs, aggregation]) => {
+        let jobsIds: string[] = aggregation ? aggregation.jobs : [];
         return jobsIds.length
           ? forkJoin(
               jobsIds.map((id) => {

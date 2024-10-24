@@ -26,6 +26,16 @@
         <mat-button-toggle value="Finished"
             [disabled]="isDisabled(filters.executions.includeFinished, filters.executions.includeRunning)">Finished</mat-button-toggle>
     </mat-button-toggle-group>
+    <mat-button-toggle-group
+        name="executions-result"
+        aria-label="Result"
+        [hideMultipleSelectionIndicator]="true"
+        [value]="includedResult$ | async"
+        (change)="setResultFilters($event)"
+        multiple>
+        <mat-button-toggle value="Success">Success</mat-button-toggle>
+        <mat-button-toggle value="Error">Error</mat-button-toggle>
+    </mat-button-toggle-group>
     <mat-form-field>
         <mat-label>Error</mat-label>
         <input matInput color="primary" [value]="filters.ui.error"

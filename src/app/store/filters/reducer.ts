@@ -9,6 +9,11 @@ export interface ExecutionsFiltersState {
   endDate: Date;
 }
 
+export interface ResultFiltersState {
+  includeSuccess: boolean;
+  includeError: boolean;
+}
+
 export interface UiFiltersState {
   error: string;
   status: JobStatus[];
@@ -18,6 +23,7 @@ export interface UiFiltersState {
 export interface AppFiltersState {
   ui: UiFiltersState;
   executions: ExecutionsFiltersState;
+  result: ResultFiltersState;
 }
 
 export const initialState: AppFiltersState = {
@@ -32,6 +38,10 @@ export const initialState: AppFiltersState = {
     startDate: new Date(),
     endDate: new Date(),
   },
+  result: {
+    includeError: true,
+    includeSuccess: true,
+  },
 };
 
 export const filtersReducer = createReducer(
@@ -43,5 +53,9 @@ export const filtersReducer = createReducer(
   on(FiltersActions.setUiFilters, (state, filters) => ({
     ...state,
     ui: { ...filters },
+  })),
+  on(FiltersActions.setResultFilters, (state, filters) => ({
+    ...state,
+    result: { ...filters },
   }))
 );

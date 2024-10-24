@@ -4,6 +4,7 @@ import { ExecutionsListComponent } from '../executions-list/executions-list.comp
 import { MatCardModule } from '@angular/material/card';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/state';
+import { displayedExecutionsSelector } from '../store/executions/selectors';
 
 @Component({
   selector: 'app-executions',
@@ -26,7 +27,7 @@ export class ExecutionsComponent {
     'jobs',
   ];
 
-  executions$ = this.store.select((state) => state.executions.executions);
+  executions$ = this.store.select(displayedExecutionsSelector);
 
   constructor(private store: Store<AppState>) {}
 }

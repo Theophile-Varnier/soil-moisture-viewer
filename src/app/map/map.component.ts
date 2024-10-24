@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/state';
 import { feature, featureCollection } from '@turf/helpers';
@@ -11,6 +11,7 @@ import * as L from 'leaflet';
 import 'leaflet-draw';
 import { ClearButtonComponent } from '../clear-button/clear-button.component';
 import { UiActions } from '../store/ui/actions';
+import { Subscription } from 'rxjs';
 (window as any).type = true;
 
 @Component({
@@ -25,13 +26,14 @@ import { UiActions } from '../store/ui/actions';
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
   map: L.Map;
   layers: L.Layer[] = [];
   tempLayers: L.Layer[] = [];
   drawControl: L.Control.Draw;
   aoi: any;
   aois: any[] = [];
+  layersSubscription: Subscription;
 
   constructor(private store: Store<AppState>) {}
 
@@ -44,6 +46,33 @@ export class MapComponent implements AfterViewInit {
     this.map.whenReady(() => {
       setTimeout(() => {
         this.map.invalidateSize();
+
+        this.layersSubscription = this.store
+          .select((st) => st.ui.layers)
+          .subscribe((layers) => {
+            const newLayers = layers.map((layer) => L.geoJSON(layer));
+            this.layers.forEach((layer) => {
+              this.map.removeLayer(layer);
+            });
+            newLayers.forEach((layer) => {
+              layer.addTo(this.map);
+            });
+            if (layers.length) {
+              const newBbox = bbox(
+                featureCollection(layers.map((layer) => feature(layer)))
+              );
+              this.map.flyToBounds(
+                L.latLngBounds(
+                  L.latLng(newBbox[1], newBbox[0]),
+                  L.latLng(newBbox[3], newBbox[2])
+                ),
+                {
+                  duration: 1,
+                }
+              );
+            }
+            this.layers = newLayers;
+          });
       }, 10);
     });
 
@@ -73,33 +102,12 @@ export class MapComponent implements AfterViewInit {
       this.aoi = layer.toGeoJSON().geometry;
       this.map.removeControl(this.drawControl);
     });
+  }
 
-    this.store
-      .select((st) => st.ui.layers)
-      .subscribe((layers) => {
-        const newLayers = layers.map((layer) => L.geoJSON(layer));
-        this.layers.forEach((layer) => {
-          this.map.removeLayer(layer);
-        });
-        newLayers.forEach((layer) => {
-          layer.addTo(this.map);
-        });
-        if (layers.length) {
-          const newBbox = bbox(
-            featureCollection(layers.map((layer) => feature(layer)))
-          );
-          this.map.flyToBounds(
-            L.latLngBounds(
-              L.latLng(newBbox[1], newBbox[0]),
-              L.latLng(newBbox[3], newBbox[2])
-            ),
-            {
-              duration: 1,
-            }
-          );
-        }
-        this.layers = newLayers;
-      });
+  ngOnDestroy(): void {
+    if (this.layersSubscription) {
+      this.layersSubscription.unsubscribe();
+    }
   }
 
   showDrawer() {
@@ -113,7 +121,7 @@ export class MapComponent implements AfterViewInit {
     });
     this.tempLayers = [];
     this.store.dispatch(
-      UiActions.selectAggregation({ aggregation: undefined })
+      UiActions.selectAggregation({ aggregationId: undefined })
     );
     this.aoi = '';
   }

@@ -2,8 +2,18 @@ import { createSelector, Store } from '@ngrx/store';
 import { AppState } from '../state';
 import { filter, share } from 'rxjs';
 import { jobsSelector } from '../jobs/selectors';
+import { aggregationsSelector } from '../executions/selectors';
 
-const selectedAggregation = (state: AppState) => state.ui.selectedAggregation;
+const selectedAggregationId = (state: AppState) =>
+  state.ui.selectedAggregationId;
+
+export const selectedAggregation = createSelector(
+  selectedAggregationId,
+  aggregationsSelector,
+  (id, aggregations) => {
+    return aggregations.find((a) => a.id === id);
+  }
+);
 
 export const selectedAggregationSelector = (store: Store<AppState>) =>
   store.select(selectedAggregation).pipe(

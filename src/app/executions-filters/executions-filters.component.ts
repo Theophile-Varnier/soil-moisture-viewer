@@ -48,6 +48,18 @@ export class ExecutionsFiltersComponent {
       return res;
     })
   );
+  includedResult$: Observable<string[]> = this.filters$.pipe(
+    map((filters) => {
+      let res = [];
+      if (filters.result.includeSuccess) {
+        res.push('Success');
+      }
+      if (filters.result.includeError) {
+        res.push('Error');
+      }
+      return res;
+    })
+  );
   constructor(private store: Store<AppState>) {}
 
   isDisabled(thisOne: boolean, thatOne: boolean) {
@@ -60,6 +72,15 @@ export class ExecutionsFiltersComponent {
         ...filters,
         includeFinished: event.value.includes('Finished'),
         includeRunning: event.value.includes('Running'),
+      })
+    );
+  }
+
+  setResultFilters(event: MatButtonToggleChange) {
+    this.store.dispatch(
+      FiltersActions.setResultFilters({
+        includeSuccess: event.value.includes('Success'),
+        includeError: event.value.includes('Error'),
       })
     );
   }

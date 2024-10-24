@@ -2,15 +2,19 @@ import { createSelector } from '@ngrx/store';
 import { AppState } from '../state';
 import { Aggregation } from './reducer';
 import { DateTime } from 'luxon';
+import { JobExecutionResult } from '../../api-client';
 
 const executionsSelector = (state: AppState) => state.executions.executions;
 const filtersSelector = (state: AppState) => state.filters;
 
-const displayedExecutionsSelector = createSelector(
+export const displayedExecutionsSelector = createSelector(
   executionsSelector,
   filtersSelector,
   (executions, filters) =>
-    !filters.ui.error && !filters.ui.ids.length
+    !filters.ui.error &&
+    !filters.ui.ids.length &&
+    filters.result.includeError &&
+    filters.result.includeSuccess
       ? executions
       : executions.filter(
           (execution) =>
@@ -26,7 +30,11 @@ const displayedExecutionsSelector = createSelector(
                   e.name?.toLowerCase().includes(filters.ui.error.toLowerCase())
               )) &&
             (!filters.ui.ids.length ||
-              execution.jobs.some((job) => filters.ui.ids.includes(job)))
+              execution.jobs.some((job) => filters.ui.ids.includes(job))) &&
+            (filters.result.includeError ||
+              execution.result !== JobExecutionResult.Error) &&
+            (filters.result.includeSuccess ||
+              execution.result !== JobExecutionResult.Success)
         )
 );
 

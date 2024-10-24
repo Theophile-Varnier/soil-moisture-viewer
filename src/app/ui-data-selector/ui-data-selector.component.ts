@@ -10,6 +10,7 @@ import { Aggregation } from '../store/executions/reducer';
 import { UiActions } from '../store/ui/actions';
 import { tap } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { selectedAggregation } from '../store/ui/selectors';
 
 @Component({
   selector: 'app-ui-data-selector',
@@ -32,9 +33,7 @@ export class UiDataSelectorComponent {
       }
     })
   );
-  selectedAggregation$ = this.store.select(
-    (state) => state.ui.selectedAggregation
-  );
+  selectedAggregation$ = this.store.select(selectedAggregation);
   panelOpen = false;
 
   constructor(private store: Store<AppState>) {}
@@ -46,8 +45,8 @@ export class UiDataSelectorComponent {
     return selectedAggregation?.id === aggregation.id;
   }
 
-  selectAggregation(aggregation: Aggregation) {
-    this.store.dispatch(UiActions.selectAggregation({ aggregation }));
+  selectAggregation(aggregationId: string) {
+    this.store.dispatch(UiActions.selectAggregation({ aggregationId }));
     this.panelOpen = false;
   }
 }

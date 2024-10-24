@@ -40,10 +40,12 @@
         <ng-container matColumnDef="jobs">
             <th mat-header-cell *matHeaderCellDef> Jobs </th>
             <td mat-cell *matCellDef="let job">
-                @for (job of job.jobs; track job) {
-                <span>{{job}}</span>
-                <br />
-                }
+                <div style="height:3em;overflow-y:auto;">
+                    @for (job of job.jobs; track job) {
+                    <span>{{job}}</span>
+                    <br />
+                    }
+                </div>
             </td>
         </ng-container>
         <ng-container matColumnDef="errors">
