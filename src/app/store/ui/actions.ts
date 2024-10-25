@@ -10,5 +10,6 @@ export const UiActions = createActionGroup({
     'Aggregation Jobs Loaded': props<{ jobs: JobDto[] }>(),
     Refresh: emptyProps(),
     'Set Loading': props<{ loading: boolean }>(),
+    'Select File': props<{ file: string }>(),
   },
 });

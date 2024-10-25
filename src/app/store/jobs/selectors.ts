@@ -1,5 +1,6 @@
 import { createSelector } from '@ngrx/store';
 import { AppState } from '../state';
+import { displayedExecutionsSelector } from '../executions/selectors';
 
 export const jobsSelector = (state: AppState) => state.jobs.jobs;
 
@@ -12,11 +13,13 @@ export const filteredJobsSelector = createSelector(
   jobsSelector,
   jobStatusFilterSelector,
   jobIdsFilterSelector,
-  (jobs, statusFilter, idsFilter) =>
+  displayedExecutionsSelector,
+  (jobs, statusFilter, idsFilter, executions) =>
     jobs.filter(
       (job) =>
         statusFilter.includes(job.status) &&
-        (!idsFilter.length || idsFilter.includes(job.id))
+        (!idsFilter.length || idsFilter.includes(job.id)) &&
+        executions.some((execution) => execution.jobs.includes(job.id))
     )
 );
 

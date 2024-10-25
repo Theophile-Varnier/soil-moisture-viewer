@@ -34,6 +34,7 @@ export interface JobDto {
     rerunPending: boolean;
     subtype: ProductSubType;
     createdAt: string;
+    files: Array<string>;
     executions: Array<JobExecutionInfo>;
 }
 export namespace JobDto {

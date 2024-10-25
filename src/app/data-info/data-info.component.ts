@@ -9,10 +9,13 @@ import { AppState } from '../store/state';
 import { CommonModule } from '@angular/common';
 import { tap } from 'rxjs';
 import {
+  filesSelector,
   selectedAggregationJobsSelector,
   selectedAggregationSelector,
 } from '../store/ui/selectors';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FileListComponent } from '../file-list/file-list.component';
+import { UiActions } from '../store/ui/actions';
 
 @Component({
   selector: 'app-data-info',
@@ -23,6 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     JobListComponent,
     ExecutionsListComponent,
+    FileListComponent,
     MatTabsModule,
     MatTooltipModule,
   ],
@@ -37,5 +41,10 @@ export class DataInfoComponent {
     })
   );
   jobs$ = this.store.select(selectedAggregationJobsSelector);
+  files$ = this.store.select(filesSelector);
   constructor(private store: Store<AppState>) {}
+
+  selectFile(file: string) {
+    this.store.dispatch(UiActions.selectFile({ file }));
+  }
 }

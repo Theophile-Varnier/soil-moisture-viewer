@@ -6,6 +6,13 @@ export interface UiState {
   selectedAggregationId?: string;
   layers: any[];
   loading: boolean;
+  selectedFile?: string;
+}
+
+export interface Tree {
+  name: string;
+  id: string;
+  children: Tree[];
 }
 
 export const initialState: UiState = {
@@ -38,6 +45,12 @@ export const uiReducer = createReducer(
     return {
       ...state,
       loading: false,
+    };
+  }),
+  on(UiActions.selectFile, (state, { file }) => {
+    return {
+      ...state,
+      selectedFile: file,
     };
   })
 );

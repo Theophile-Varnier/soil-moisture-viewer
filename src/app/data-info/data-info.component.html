@@ -18,6 +18,11 @@
                             [light]="true"
                             [jobs]="jobs"></app-job-list>
                     </mat-tab>
+                    <mat-tab label="Files">
+                        <app-file-list *ngIf="files$ | async as files"
+                            [files]="files"
+                            (fileSelected)="selectFile($event)"></app-file-list>
+                    </mat-tab>
                 </mat-tab-group>
             </ng-container>
         </div>

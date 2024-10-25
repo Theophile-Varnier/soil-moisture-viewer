@@ -20,6 +20,7 @@ export interface JobExecutionUpdate {
     additionalInformation?: string | null;
     errorId?: string | null;
     errorName?: string | null;
+    files: Array<string> | null;
 }
 export namespace JobExecutionUpdate {
 }
