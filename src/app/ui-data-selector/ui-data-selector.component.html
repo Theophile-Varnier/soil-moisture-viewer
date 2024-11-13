@@ -15,7 +15,7 @@
                             <div class="aggregation-line"
                                 *ngFor="let aggregation of aggregations"
                                 [class.selected]="isSelected(aggregation, selectedAggregation.value)"
-                                (click)="selectAggregation(aggregation.id)">
+                                (click)="selectAggregation(aggregation)">
                                 <span>{{aggregation.geoLocation ??
                                     aggregation.id}}
                                     ({{aggregation.jobs.length}})</span>

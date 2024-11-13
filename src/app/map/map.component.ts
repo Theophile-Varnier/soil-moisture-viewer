@@ -12,6 +12,20 @@ import 'leaflet-draw';
 import { ClearButtonComponent } from '../clear-button/clear-button.component';
 import { UiActions } from '../store/ui/actions';
 import { Subscription } from 'rxjs';
+import { layersSelector, selectedFilesSelector } from '../store/ui/selectors';
+import {
+  S3Client,
+  GetObjectCommand,
+  GetObjectCommandInput,
+} from '@aws-sdk/client-s3';
+
+import { fromArrayBuffer } from 'geotiff';
+
+import { leafletGeotiff } from './leaflet-geotiff';
+import { LeafletGeotiffPlotty } from './leaflet-geotiff-plotty';
+
+// import './leaflet-geotiff.js';
+
 (window as any).type = true;
 
 @Component({
@@ -30,17 +44,32 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   map: L.Map;
   layers: L.Layer[] = [];
   tempLayers: L.Layer[] = [];
+  dataLayers: L.Layer[] = [];
   drawControl: L.Control.Draw;
   aoi: any;
   aois: any[] = [];
   layersSubscription: Subscription;
+  tifSubscription: Subscription;
+  s3params: GetObjectCommandInput = {
+    Bucket: '',
+    Key: '',
+  };
+  private s3: S3Client;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>) {
+    this.s3 = new S3Client({
+      credentials: {
+        accessKeyId: '',
+        secretAccessKey: '',
+      },
+      region: '',
+    });
+  }
 
   ngAfterViewInit(): void {
     this.map = L.map('map', {
       center: L.latLng(42, 2),
-      zoom: 10,
+      zoom: 4,
     });
 
     this.map.whenReady(() => {
@@ -48,7 +77,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.map.invalidateSize();
 
         this.layersSubscription = this.store
-          .select((st) => st.ui.layers)
+          .select(layersSelector)
           .subscribe((layers) => {
             const newLayers = layers.map((layer) => L.geoJSON(layer));
             this.layers.forEach((layer) => {
@@ -72,6 +101,31 @@ export class MapComponent implements AfterViewInit, OnDestroy {
               );
             }
             this.layers = newLayers;
+          });
+
+        this.tifSubscription = this.store
+          .select(selectedFilesSelector)
+          .subscribe((files) => {
+            this.clearDataLayers();
+            for (const file of files) {
+              this.s3params.Key = file!;
+              const command = new GetObjectCommand(this.s3params);
+              this.s3.send(command, (err, data) => {
+                if (err) {
+                  console.log(err);
+                } else if (data) {
+                  data.Body?.transformToByteArray().then((content) => {
+                    var layer = leafletGeotiff(content.buffer, {
+                      sourceFunction: fromArrayBuffer,
+                      renderer: new LeafletGeotiffPlotty(),
+                    });
+
+                    this.map.addLayer(layer);
+                    this.dataLayers.push(layer);
+                  });
+                }
+              });
+            }
           });
       }, 10);
     });
@@ -120,10 +174,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.map.removeLayer(layer);
     });
     this.tempLayers = [];
+    this.clearDataLayers();
     this.store.dispatch(
-      UiActions.selectAggregation({ aggregationId: undefined })
+      UiActions.selectAggregation({ aggregation: undefined })
     );
     this.aoi = '';
+  }
+
+  clearDataLayers() {
+    this.dataLayers.forEach((layer) => {
+      this.map.removeLayer(layer);
+    });
+    this.dataLayers = [];
   }
 
   generateAois(event: { numberOfJobs: number; keepBbox: boolean }) {

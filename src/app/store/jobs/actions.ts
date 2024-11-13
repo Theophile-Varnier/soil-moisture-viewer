@@ -4,7 +4,6 @@ import { JobBase, JobDto, JobStatus } from '../../api-client';
 export const JobsActions = createActionGroup({
   source: 'Jobs',
   events: {
-    'Load Jobs': props<{ jobs: JobDto[]; ids: string[] }>(),
     'Jobs Loaded': props<{ jobs: JobDto[] }>(),
     'Select Job': props<{ id: string }>(),
     'Deselect Job': props<{ id: string }>(),

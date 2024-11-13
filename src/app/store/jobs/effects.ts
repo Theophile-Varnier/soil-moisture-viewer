@@ -4,74 +4,27 @@ import { JobsActions } from './actions';
 import { concatLatestFrom } from '@ngrx/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../state';
-import { concat, filter, from, map, mergeMap, switchMap, toArray } from 'rxjs';
+import { concat, from, map, mergeMap, switchMap, toArray } from 'rxjs';
 import { JobsService } from '../../api-client';
 import { authenticatedUserSelector } from '../auth/selectors';
 import { ExecutionsActions } from '../executions/actions';
 
 @Injectable()
 export class JobsEffects {
-  NUM_JOBS_TO_QUERY = 40;
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,
     private jobsService: JobsService
   ) {}
 
-  startLoadingJobs = createEffect(() =>
+  loadJobs = createEffect(() =>
     this.actions$.pipe(
       ofType(ExecutionsActions.executionsLoaded),
       switchMap((executions) => {
         const ids = [...new Set(executions.executions.flatMap((e) => e.jobs))];
-        const toLoad = ids.splice(this.NUM_JOBS_TO_QUERY);
-        return this.jobsService
-          .getJobListJobsGet(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            ids
-          )
-          .pipe(
-            map((jobs) => {
-              return { jobs, ids: toLoad };
-            })
-          );
+        return this.jobsService.getJobListJobsQueryPost(ids);
       }),
-      map((jobs) =>
-        jobs.ids.length
-          ? JobsActions.loadJobs(jobs)
-          : JobsActions.jobsLoaded({ jobs: jobs.jobs })
-      )
-    )
-  );
-
-  loadJobs = createEffect(() =>
-    this.actions$.pipe(
-      ofType(JobsActions.loadJobs),
-      filter((action) => action.ids.length > 0),
-      switchMap((action) => {
-        const ids = [...action.ids];
-        const toLoad = ids.splice(this.NUM_JOBS_TO_QUERY);
-        return this.jobsService
-          .getJobListJobsGet(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            ids
-          )
-          .pipe(
-            map((jobs) => ({ jobs: [...jobs, ...action.jobs], ids: toLoad }))
-          );
-      }),
-      map((jobs) =>
-        jobs.ids.length
-          ? JobsActions.loadJobs(jobs)
-          : JobsActions.jobsLoaded({ jobs: jobs.jobs })
-      )
+      map((jobs) => JobsActions.jobsLoaded({ jobs }))
     )
   );
 

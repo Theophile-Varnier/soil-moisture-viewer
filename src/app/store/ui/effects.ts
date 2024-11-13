@@ -2,26 +2,18 @@ import { Injectable } from '@angular/core';
 import { AppState } from '../state';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { UiActions } from './actions';
-import {
-  combineLatest,
-  forkJoin,
-  map,
-  mergeMap,
-  of,
-  withLatestFrom,
-} from 'rxjs';
+import { combineLatest, map, mergeMap, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { JobsService } from '../../api-client';
 import { FiltersActions } from '../filters/actions';
 import { authenticatedUserSelector } from '../auth/selectors';
-import { selectedAggregation } from './selectors';
+import { JobsService } from '../../api-client';
 
 @Injectable()
 export class UiEffects {
   constructor(
     private store: Store<AppState>,
     private actions$: Actions,
-    private jobsService: JobsService
+    private service: JobsService
   ) {}
 
   toggleLoading = createEffect(() =>
@@ -33,30 +25,15 @@ export class UiEffects {
     ]).pipe(map(() => UiActions.setLoading({ loading: true })))
   );
 
-  loadAggregationsJobs = createEffect(() =>
+  loadFiles = createEffect(() =>
     this.actions$.pipe(
       ofType(UiActions.selectAggregation),
-      withLatestFrom(
-        this.store.select((st) => st.jobs.jobs),
-        this.store.select(selectedAggregation)
+      mergeMap((action) =>
+        action.aggregation
+          ? this.service.getJobFilesJobsFilesPost(action.aggregation?.jobs)
+          : of([])
       ),
-      mergeMap(([action, jobs, aggregation]) => {
-        let jobsIds: string[] = aggregation ? aggregation.jobs : [];
-        return jobsIds.length
-          ? forkJoin(
-              jobsIds.map((id) => {
-                const existingJob = jobs.find((job) => job.id === id);
-                if (existingJob) {
-                  return of(existingJob);
-                }
-                return this.jobsService.getJobDetailJobsJobIdGet(id);
-              })
-            )
-          : of([]);
-      }),
-      map((jobs) => {
-        return UiActions.aggregationJobsLoaded({ jobs });
-      })
+      map((files) => UiActions.setFiles({ files: files as any }))
     )
   );
 }

@@ -3,7 +3,6 @@ import {
   Component,
   effect,
   input,
-  OnInit,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -26,7 +25,6 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ExecutionsListComponent } from '../executions-list/executions-list.component';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/state';
 import { JobsActions } from '../store/jobs/actions';
@@ -48,7 +46,6 @@ import { tap } from 'rxjs';
     MatCheckboxModule,
     FormsModule,
     MatIconModule,
-    ExecutionsListComponent,
     MatMenuModule,
   ],
   templateUrl: './job-list.component.html',
@@ -76,8 +73,6 @@ export class JobListComponent {
     'status',
     'startDate',
     'endDate',
-    'errored',
-    'lastExecution',
   ];
   displayedColumnsLight: string[] = ['id', 'name', 'productType', 'subType'];
   displayedColumns: string[];
@@ -94,13 +89,8 @@ export class JobListComponent {
     status: 'Status',
     startDate: 'Start date',
     endDate: 'End date',
-    errored: 'Errored',
-    lastExecution: 'Last execution date',
-    expand: '',
     actions: '',
   };
-
-  expandedJob?: JobTableDto;
 
   selectedJobs$ = this.store.select((state) => state.jobs.selectedJobsIds);
 
@@ -119,7 +109,7 @@ export class JobListComponent {
       if (this.light()) {
         this.displayedColumns = [...this.displayedColumnsLight, 'actions'];
       } else {
-        this.displayedColumns = [...this.availableColumns, 'actions', 'expand'];
+        this.displayedColumns = [...this.availableColumns, 'actions'];
       }
     });
   }

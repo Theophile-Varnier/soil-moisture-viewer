@@ -45,8 +45,8 @@ export class UiDataSelectorComponent {
     return selectedAggregation?.id === aggregation.id;
   }
 
-  selectAggregation(aggregationId: string) {
-    this.store.dispatch(UiActions.selectAggregation({ aggregationId }));
+  selectAggregation(aggregation: Aggregation) {
+    this.store.dispatch(UiActions.selectAggregation({ aggregation }));
     this.panelOpen = false;
   }
 }

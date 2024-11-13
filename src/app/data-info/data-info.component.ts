@@ -42,6 +42,7 @@ export class DataInfoComponent {
   );
   jobs$ = this.store.select(selectedAggregationJobsSelector);
   files$ = this.store.select(filesSelector);
+
   constructor(private store: Store<AppState>) {}
 
   selectFile(file: string) {

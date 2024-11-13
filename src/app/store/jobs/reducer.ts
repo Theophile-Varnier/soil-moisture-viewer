@@ -16,10 +16,6 @@ export const initialState: JobsState = {
 
 export const jobsReducer = createReducer(
   initialState,
-  on(JobsActions.loadJobs, (state, { jobs }) => ({
-    ...state,
-    jobs,
-  })),
   on(JobsActions.jobsLoaded, (state, { jobs }) => ({
     ...state,
     jobs,

@@ -2,7 +2,6 @@ import { DateTime } from 'luxon';
 import {
   JobDto,
   JobExecutionInfo,
-  JobExecutionResult,
   JobStatus,
   ProductSubType,
   ProductType,
@@ -14,8 +13,6 @@ export class JobTableDto {
   startDate?: string | null;
   endDate?: string | null;
   status: JobStatus;
-  errored: boolean = false;
-  lastExecution?: string;
   productType: ProductType;
   subType: ProductSubType;
   executions: JobExecutionInfo[] = [];
@@ -35,20 +32,5 @@ export class JobTableDto {
         suppressMilliseconds: true,
         includeOffset: false,
       })!;
-    this.errored = src.executions.some(
-      (e) => e.result === JobExecutionResult.Error
-    );
-    if (src.executions.length > 0) {
-      this.lastExecution = new Date(
-        Math.max(
-          ...src.executions.map((e) => new Date(e.executionStartDate).getTime())
-        )
-      ).toISOString();
-    }
-    this.executions = [...src.executions].sort(
-      (a, b) =>
-        new Date(b.executionStartDate).getTime() -
-        new Date(a.executionStartDate).getTime()
-    );
   }
 }

@@ -4,9 +4,9 @@ import { JobsActions } from '../jobs/actions';
 
 export interface UiState {
   selectedAggregationId?: string;
-  layers: any[];
   loading: boolean;
   selectedFile?: string;
+  files: Record<string, string[]>;
 }
 
 export interface Tree {
@@ -17,22 +17,16 @@ export interface Tree {
 
 export const initialState: UiState = {
   selectedAggregationId: undefined,
-  layers: [],
   loading: false,
+  files: {},
 };
 
 export const uiReducer = createReducer(
   initialState,
-  on(UiActions.selectAggregation, (state, { aggregationId }) => {
+  on(UiActions.selectAggregation, (state, { aggregation }) => {
     return {
       ...state,
-      selectedAggregationId: aggregationId,
-    };
-  }),
-  on(UiActions.aggregationJobsLoaded, (state, { jobs }) => {
-    return {
-      ...state,
-      layers: jobs.map((job) => job.aoi),
+      selectedAggregationId: aggregation?.id,
     };
   }),
   on(UiActions.setLoading, (state, { loading }) => {
@@ -45,6 +39,12 @@ export const uiReducer = createReducer(
     return {
       ...state,
       loading: false,
+    };
+  }),
+  on(UiActions.setFiles, (state, { files }) => {
+    return {
+      ...state,
+      files,
     };
   }),
   on(UiActions.selectFile, (state, { file }) => {
